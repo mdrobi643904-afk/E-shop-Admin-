@@ -66,6 +66,7 @@
                                     <a href="#products" class="sidebar-link block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Products</a>
                                     <a href="#banners" class="sidebar-link block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Banners</a>
                                     <a href="#categories" class="sidebar-link block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Categories</a>
+                                    <a href="#coupons" class="sidebar-link block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Coupons</a>
                                     <a href="#settings" class="sidebar-link block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
                                     <div class="border-t my-1"></div>
                                     <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
@@ -94,6 +95,10 @@
                      <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-semibold">Manage Categories</h2><button id="add-category-btn" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Add New Category</button></div>
                     <div class="bg-white rounded-lg shadow overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr></thead><tbody id="categories-table-body" class="bg-white divide-y divide-gray-200"></tbody></table></div>
                 </div>
+                 <div id="coupons-panel" class="hidden">
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-semibold">Manage Coupons</h2><button id="add-coupon-btn" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Add New Coupon</button></div>
+                    <div class="bg-white rounded-lg shadow overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Coupon Code</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Discount (%)</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr></thead><tbody id="coupons-table-body" class="bg-white divide-y divide-gray-200"></tbody></table></div>
+                </div>
                 <div id="settings-panel" class="hidden">
                     <h2 class="text-2xl font-semibold mb-6">Website Settings</h2>
                     <div class="space-y-8">
@@ -105,8 +110,9 @@
                                 <div><label class="block text-sm">Nagad Number</label><input type="text" id="nagadNumber" class="w-full mt-1 border-gray-300 rounded-md p-2"></div>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow"><h3 class="text-lg font-semibold border-b pb-2 mb-4">Footer Content</h3>
+                        <div class="bg-white p-6 rounded-lg shadow"><h3 class="text-lg font-semibold border-b pb-2 mb-4">Footer & Contact</h3>
                             <div class="space-y-4">
+                                <div><label class="block text-sm">WhatsApp Number (for Order button)</label><input type="text" id="whatsappNumber" class="w-full mt-1 border-gray-300 rounded-md p-2"></div>
                                 <div><label class="block text-sm">Brand Info</label><textarea id="brandInfo" rows="3" class="w-full mt-1 border-gray-300 rounded-md p-2"></textarea></div>
                                 <div><label class="block text-sm">About Us</label><textarea id="aboutUs" rows="3" class="w-full mt-1 border-gray-300 rounded-md p-2"></textarea></div>
                                 <div><label class="block text-sm">Contact Us</label><textarea id="contactUs" rows="3" class="w-full mt-1 border-gray-300 rounded-md p-2"></textarea></div>
@@ -155,8 +161,8 @@
         
         const loginView = document.getElementById('login-view'), dashboardView = document.getElementById('dashboard-view'), loginForm = document.getElementById('login-form'), loginError = document.getElementById('login-error'), adminEmailEl = document.getElementById('admin-email'), logoutBtn = document.getElementById('logout-btn'), menuButton = document.getElementById('menu-button'), menuDropdown = document.getElementById('menu-dropdown');
         const contentPanels = document.querySelectorAll('main > div'), sidebarLinks = document.querySelectorAll('.sidebar-link');
-        const ordersTableBody = document.getElementById('orders-table-body'), productsTableBody = document.getElementById('products-table-body'), bannersTableBody = document.getElementById('banners-table-body'), categoriesTableBody = document.getElementById('categories-table-body');
-        const addProductBtn = document.getElementById('add-product-btn'), addBannerBtn = document.getElementById('add-banner-btn'), addCategoryBtn = document.getElementById('add-category-btn'), saveSettingsBtn = document.getElementById('save-settings-btn');
+        const ordersTableBody = document.getElementById('orders-table-body'), productsTableBody = document.getElementById('products-table-body'), bannersTableBody = document.getElementById('banners-table-body'), categoriesTableBody = document.getElementById('categories-table-body'), couponsTableBody = document.getElementById('coupons-table-body');
+        const addProductBtn = document.getElementById('add-product-btn'), addBannerBtn = document.getElementById('add-banner-btn'), addCategoryBtn = document.getElementById('add-category-btn'), saveSettingsBtn = document.getElementById('save-settings-btn'), addCouponBtn = document.getElementById('add-coupon-btn');
         const modalOverlay = document.getElementById('modal-overlay'), modal = document.getElementById('modal'), modalContent = document.getElementById('modal-content');
 
         try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); authStateListener(); } catch (e) { console.error("Firebase init failed", e); alert("DB connection failed."); }
@@ -185,6 +191,7 @@
             addProductBtn.addEventListener('click', () => openProductModal());
             addBannerBtn.addEventListener('click', () => openBannerModal());
             addCategoryBtn.addEventListener('click', () => openCategoryModal());
+            addCouponBtn.addEventListener('click', () => openCouponModal());
             saveSettingsBtn.addEventListener('click', saveSettings);
             modalOverlay.addEventListener('click', closeModal);
             logoutBtn.addEventListener('click', () => signOut(auth));
@@ -194,12 +201,13 @@
                 if(e.target.closest('.delete-product-btn')) deleteProduct(e.target.closest('.delete-product-btn').dataset.id);
                 if(e.target.closest('.delete-banner-btn')) deleteBanner(e.target.closest('.delete-banner-btn').dataset.id);
                 if(e.target.closest('.delete-category-btn')) deleteCategory(e.target.closest('.delete-category-btn').dataset.id);
+                if(e.target.closest('.delete-coupon-btn')) deleteCoupon(e.target.closest('.delete-coupon-btn').dataset.id);
             });
         }
 
         loginForm.addEventListener('submit', async e => { e.preventDefault(); loginError.textContent = ""; try { await signInWithEmailAndPassword(auth, loginForm.email.value, loginForm.password.value); } catch (error) { loginError.textContent = error.message; } });
         
-        function fetchAllData() { [fetchOrders, fetchProducts, fetchBanners, fetchCategories, fetchSettings].forEach(f => f()); }
+        function fetchAllData() { [fetchOrders, fetchProducts, fetchBanners, fetchCategories, fetchCoupons, fetchSettings].forEach(f => f()); }
         
         function switch_tab(tabId) {
             sidebarLinks.forEach(link => link.classList.toggle('active', link.hash === `#${tabId}`));
@@ -310,6 +318,11 @@
         async function saveCategory(e) { e.preventDefault(); const data={name:document.getElementById('category-name').value}; try { await addDoc(collection(db,'categories'),data); closeModal(); } catch(e) { alert(e.message); } }
         async function deleteCategory(id) { openConfirmModal('Are you sure you want to delete this category?', async () => await deleteDoc(doc(db,'categories',id))); }
         
+        function fetchCoupons() { onSnapshot(collection(db, "coupons"), s => { couponsTableBody.innerHTML = s.empty ? '<tr><td colspan="4" class="text-center py-4 text-gray-500">No coupons.</td></tr>' : ''; s.forEach(d => { const c = {id:d.id, ...d.data()}, r = document.createElement('tr'); const statusColor = c.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; r.innerHTML=`<td class="p-3 text-sm">${c.code}</td><td class="p-3 text-sm">${c.discountPercentage}%</td><td class="p-3 text-sm"><span class="px-2 py-1 text-xs rounded-full ${statusColor}">${c.active ? 'Active' : 'Inactive'}</span></td><td class="p-3 text-sm"><button class="delete-coupon-btn text-red-600" data-id="${c.id}">Delete</button></td>`; couponsTableBody.appendChild(r); }); }); }
+        async function openCouponModal() { const html=`<form id="coupon-form" class="p-6 space-y-4"><div class="flex justify-between items-start"><h3 class="text-xl font-semibold">Add New Coupon</h3><button type="button" id="modal-close-btn" class="text-gray-400 hover:text-gray-600">&times;</button></div><div><label class="block text-sm">Coupon Code (e.g., SAVE10)</label><input type="text" id="coupon-code" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Discount Percentage</label><input type="number" id="coupon-discount" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div class="flex items-center"><input type="checkbox" id="coupon-active" checked class="h-4 w-4 text-indigo-600 border-gray-300 rounded"><label for="coupon-active" class="ml-2 block text-sm">Active</label></div><div class="flex justify-end pt-4"><button type="submit" class="py-2 px-6 bg-indigo-600 text-white rounded-md">Save Coupon</button></div></form>`; openModal(html); document.getElementById('modal-close-btn').addEventListener('click', closeModal); document.getElementById('coupon-form').addEventListener('submit', saveCoupon); }
+        async function saveCoupon(e) { e.preventDefault(); const code = document.getElementById('coupon-code').value.toUpperCase(); const data={ code, discountPercentage: parseFloat(document.getElementById('coupon-discount').value), active: document.getElementById('coupon-active').checked }; try { await setDoc(doc(db, 'coupons', code), data); alert('Coupon saved!'); closeModal(); } catch(e) { alert(e.message); } }
+        async function deleteCoupon(id) { openConfirmModal('Are you sure you want to delete this coupon?', async () => { try { await deleteDoc(doc(db, 'coupons', id)); alert('Coupon deleted!'); } catch(e) { alert(e.message); } }); }
+
         async function fetchSettings() {
             const settingsRef = doc(db, 'settings', 'main');
             const docSnap = await getDoc(settingsRef);
@@ -329,6 +342,7 @@
                 document.getElementById('facebookUrl').value = s.facebookUrl || '';
                 document.getElementById('twitterUrl').value = s.twitterUrl || '';
                 document.getElementById('instagramUrl').value = s.instagramUrl || '';
+                document.getElementById('whatsappNumber').value = s.whatsappNumber || '';
             }
         }
         
@@ -348,6 +362,7 @@
                 facebookUrl: document.getElementById('facebookUrl').value,
                 twitterUrl: document.getElementById('twitterUrl').value,
                 instagramUrl: document.getElementById('instagramUrl').value,
+                whatsappNumber: document.getElementById('whatsappNumber').value,
             };
             try { await setDoc(doc(db, 'settings', 'main'), data); alert('Settings saved!'); } catch(e) { alert('Error: ' + e.message); }
         }
