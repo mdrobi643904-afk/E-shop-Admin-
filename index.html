@@ -113,6 +113,7 @@
                         <div class="bg-white p-6 rounded-lg shadow"><h3 class="text-lg font-semibold border-b pb-2 mb-4">Footer & Contact</h3>
                             <div class="space-y-4">
                                 <div><label class="block text-sm">WhatsApp Number (for Order button)</label><input type="text" id="whatsappNumber" class="w-full mt-1 border-gray-300 rounded-md p-2"></div>
+                                <div><label class="block text-sm">Size Guide</label><textarea id="sizeGuide" rows="5" class="w-full mt-1 border-gray-300 rounded-md p-2"></textarea></div>
                                 <div><label class="block text-sm">Brand Info</label><textarea id="brandInfo" rows="3" class="w-full mt-1 border-gray-300 rounded-md p-2"></textarea></div>
                                 <div><label class="block text-sm">About Us</label><textarea id="aboutUs" rows="3" class="w-full mt-1 border-gray-300 rounded-md p-2"></textarea></div>
                                 <div><label class="block text-sm">Contact Us</label><textarea id="contactUs" rows="3" class="w-full mt-1 border-gray-300 rounded-md p-2"></textarea></div>
@@ -261,6 +262,9 @@
                     <div><strong>Sender Number:</strong> ${order.paymentDetails.senderNumber}</div>
                 `;
             }
+             if (order.comments) {
+                paymentDetailsHTML += `<div class="md:col-span-2 mt-2 pt-2 border-t"><strong>Comment:</strong> <p class="text-gray-600 italic">${order.comments}</p></div>`;
+            }
             const modalHTML = `<div class="p-6"><div class="flex justify-between items-start"><h3 class="text-xl font-semibold text-gray-900">Order Details</h3><button type="button" id="modal-close-btn" class="text-gray-400 hover:text-gray-600">&times;</button></div><div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"><div><strong>Customer:</strong> ${order.fullName}</div><div><strong>Email:</strong> ${order.customerEmail || 'N/A'}</div><div><strong>Phone:</strong> ${order.mobileNumber}</div><div><strong>Address:</strong> ${order.address}</div><div><strong>Order Date:</strong> ${new Date(order.createdAt?.toDate()).toLocaleString()}</div><div><strong>Grand Total:</strong> BDT ${order.grandTotal.toLocaleString()}</div>${paymentDetailsHTML}</div><div class="mt-4"><h4 class="font-semibold">Items:</h4><ul class="list-disc list-inside mt-2 text-sm text-gray-600">${order.items.map(item => `<li>${item.name} (Size: ${item.size}) x ${item.quantity} - BDT ${(item.price * item.quantity).toLocaleString()}</li>`).join('')}</ul></div><div class="mt-6"><label for="status-select" class="block text-sm font-medium text-gray-700">Update Status</label><div class="flex items-center space-x-2 mt-1"><select id="status-select" class="flex-grow border-gray-300 rounded-md shadow-sm"><option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option><option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option><option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option><option value="canceled" ${order.status === 'canceled' ? 'selected' : ''}>Canceled</option></select><button id="update-status-btn" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Update</button></div></div></div>`;
             openModal(modalHTML);
             document.getElementById('modal-close-btn').addEventListener('click', closeModal);
@@ -281,7 +285,7 @@
 
         async function openProductModal() {
             const categoryOptions = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            const modalHTML = `<form id="product-form" class="p-6 space-y-4"><div class="flex justify-between items-start"><h3 class="text-xl font-semibold">Add New Product</h3><button type="button" id="modal-close-btn" class="text-gray-400 hover:text-gray-600">&times;</button></div><div><label class="block text-sm">Product ID (Numeric)</label><input type="number" id="product-id" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Name</label><input type="text" id="product-name" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Description</label><textarea id="product-description" rows="3" class="w-full mt-1 border border-gray-300 rounded-md p-2"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm">Price</label><input type="number" id="product-price" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Category</label><select id="product-category" required class="w-full mt-1 border border-gray-300 rounded-md p-2">${categoryOptions}</select></div></div><div><label class="block text-sm">Main Image URL</label><input type="text" id="product-image" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Other Image URLs (comma-separated)</label><input type="text" id="product-images" class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Sizes (comma-separated)</label><input type="text" id="product-sizes" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div class="flex justify-end pt-4"><button type="submit" class="py-2 px-6 bg-indigo-600 text-white rounded-md">Save</button></div></form>`;
+            const modalHTML = `<form id="product-form" class="p-6 space-y-4"><div class="flex justify-between items-start"><h3 class="text-xl font-semibold">Add New Product</h3><button type="button" id="modal-close-btn" class="text-gray-400 hover:text-gray-600">&times;</button></div><div><label class="block text-sm">Product ID (Numeric)</label><input type="number" id="product-id" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Name</label><input type="text" id="product-name" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Description</label><textarea id="product-description" rows="3" class="w-full mt-1 border border-gray-300 rounded-md p-2"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm">Price</label><input type="number" id="product-price" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Category</label><select id="product-category" required class="w-full mt-1 border border-gray-300 rounded-md p-2">${categoryOptions}</select></div></div><div><label class="block text-sm">Main Image URL</label><input type="text" id="product-image" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Other Image URLs (comma-separated)</label><input type="text" id="product-images" class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Sizes (comma-separated)</label><input type="text" id="product-sizes" required class="w-full mt-1 border border-gray-300 rounded-md p-2"></div><div><label class="block text-sm">Size Guide</label><textarea id="product-size-guide" rows="3" class="w-full mt-1 border border-gray-300 rounded-md p-2"></textarea></div><div class="flex justify-end pt-4"><button type="submit" class="py-2 px-6 bg-indigo-600 text-white rounded-md">Save</button></div></form>`;
             openModal(modalHTML);
             document.getElementById('modal-close-btn').addEventListener('click', closeModal);
             document.getElementById('product-form').addEventListener('submit', saveProduct);
@@ -296,6 +300,7 @@
                 price: parseFloat(document.getElementById('product-price').value), category: document.getElementById('product-category').value,
                 image: document.getElementById('product-image').value, images: document.getElementById('product-images').value.split(',').map(s=>s.trim()).filter(Boolean),
                 sizes: document.getElementById('product-sizes').value.split(',').map(s=>s.trim()).filter(Boolean),
+                sizeGuide: document.getElementById('product-size-guide').value,
             };
             try {
                 await setDoc(doc(db, 'products', docId), data);
@@ -343,6 +348,7 @@
                 document.getElementById('twitterUrl').value = s.twitterUrl || '';
                 document.getElementById('instagramUrl').value = s.instagramUrl || '';
                 document.getElementById('whatsappNumber').value = s.whatsappNumber || '';
+                document.getElementById('sizeGuide').value = s.sizeGuide || '';
             }
         }
         
@@ -363,6 +369,7 @@
                 twitterUrl: document.getElementById('twitterUrl').value,
                 instagramUrl: document.getElementById('instagramUrl').value,
                 whatsappNumber: document.getElementById('whatsappNumber').value,
+                sizeGuide: document.getElementById('sizeGuide').value,
             };
             try { await setDoc(doc(db, 'settings', 'main'), data); alert('Settings saved!'); } catch(e) { alert('Error: ' + e.message); }
         }
